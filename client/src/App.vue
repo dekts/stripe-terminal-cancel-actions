@@ -82,7 +82,24 @@ const capturePayment = async () => {
 };
 
 // Cancel action click handler
-const cancelAction = async () => {};
+const cancelAction = async () => {
+  const response = await fetch("/api/readers/cancel", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ readerId: reader.value.id }),
+  });
+  const result = await response.json();
+  const { error } = result;
+  if (error) {
+    addMessage(error.message);
+    return;
+  }
+  addMessage(
+    `Cancelling a simulated reader ${reader.value.id} for payment ${paymentIntent.value.id}`
+  );
+};
 
 // Helpers
 function reset() {

@@ -1,7 +1,9 @@
-require("dotenv").config({ path: "./.env" });
+require("dotenv").config({ path: "../.env" });
 const express = require("express");
 const app = express();
 app.use(express.json({}));
+
+console.log(process.env.STRIPE_SECRET_KEY);
 
 const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY, {
   apiVersion: "2020-08-27",
@@ -48,6 +50,17 @@ app.post("/readers/simulate-payment", async (req, res) => {
     const { readerId } = req.body;
     const reader =
       await stripe.testHelpers.terminal.readers.presentPaymentMethod(readerId);
+    res.send({ reader });
+  } catch (e) {
+    res.send({ error: { message: e.message } });
+  }
+});
+
+app.post("/readers/cancel", async (req, res) => {
+  try {
+    const { readerId } = req.body;
+    const reader =
+      await stripe.terminal.readers.cancelAction(readerId);
     res.send({ reader });
   } catch (e) {
     res.send({ error: { message: e.message } });
